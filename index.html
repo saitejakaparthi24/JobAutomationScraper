@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Job Finder</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 40px;
+    }
+
+    select, input, button {
+      font-size: 16px;
+      padding: 4px;
+    }
+
+    ul {
+      margin-top: 20px;
+      line-height: 1.8;
+    }
+
+    a {
+      color: blue;
+      text-decoration: underline;
+      cursor: pointer;
+    }
+  </style>
+</head>
+
+<body>
+
+  <h2>
+    Find a job about
+    <input id="search" size="20" placeholder="Job keyword">
+    in
+    <input id="location" size="20" placeholder="Location">
+    posted within the past
+    <select id="past">
+      <option value="day">Day</option>
+      <option value="week">Week</option>
+      <option value="month">Month</option>
+      <option value="year">Year</option>
+    </select>
+  </h2>
+
+  <button onclick="go()">Go</button>
+
+  <ul id="links"></ul>
+
+<script>
+const ATS_SITES = [
+  "jobs.lever.co",
+  "boards.greenhouse.io",
+  "jobs.ashbyhq.com",
+  "jobs.jobvite.com",
+  "jobs.smartrecruiters.com",
+  "jobs.workable.com",
+  "myworkdayjobs.com",
+  "careers.jobscore.com",
+  "ats.rippling.com",
+  "ats.comparably.com",
+  "recruiting.paylocity.com",
+  "app.dover.com",
+  "jobs.gem.com",
+  "pinpointing.com",
+  "breezy.hr",
+  "dayforcehcm.com" // added dayforce
+];
+
+function daysFromPast(past) {
+  switch (past) {
+    case "day": return 1;
+    case "week": return 7;
+    case "month": return 30;
+    case "year": return 365;
+    default: return 7;
+  }
+}
+
+function buildGoogleUrl(query, location, site, days) {
+  let q = `${query}`; // removed exact match quotes
+  if(location) q += ` ${location}`;
+  q += ` site:${site}`;
+  return `https://www.google.com/search?q=${encodeURIComponent(q)}&tbs=qdr:d${days}`;
+}
+
+function go() {
+  const query = document.getElementById("search").value.trim();
+  const location = document.getElementById("location").value.trim();
+  const past = document.getElementById("past").value;
+  const days = daysFromPast(past);
+  const ul = document.getElementById("links");
+
+  ul.innerHTML = "";
+
+  if (!query) {
+    alert("Enter a job keyword");
+    return;
+  }
+
+  ATS_SITES.forEach(site => {
+    const url = buildGoogleUrl(query, location, site, days);
+    const li = document.createElement("li");
+    li.innerHTML = `<a href="${url}" target="_blank">${site}</a>`;
+    ul.appendChild(li);
+  });
+
+  // update URL params
+  const params = new URLSearchParams({
+    s: query,
+    loc: location,
+    past: past
+  });
+  history.replaceState(null, "", "?" + params.toString());
+}
+
+// Load from URL params
+(function initFromQueryString() {
+  const params = new URLSearchParams(window.location.search);
+  if (params.get("s")) document.getElementById("search").value = params.get("s");
+  if (params.get("loc")) document.getElementById("location").value = params.get("loc");
+  if (params.get("past")) document.getElementById("past").value = params.get("past");
+  if (params.get("s")) go();
+})();
+</script>
+
+</body>
+</html>
