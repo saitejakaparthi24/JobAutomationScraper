@@ -26,7 +26,7 @@ import psycopg2
 # =============================================
 # CONFIG
 # =============================================
-KEYWORDS = ["Google Ads", "SQL Developer"]
+KEYWORDS = ["DevOps Engineer", "Java Backend Developer"]
 LOCATION = "United States"
 MAX_RETRY = 3
 SOURCE_PORTAL = "LinkedIn"
